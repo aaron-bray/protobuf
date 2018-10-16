@@ -26,6 +26,7 @@ set(libprotobuf_files
   ${protobuf_source_dir}/src/google/protobuf/source_context.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/struct.pb.cc
   ${protobuf_source_dir}/src/google/protobuf/stubs/mathlimits.cc
+  ${protobuf_source_dir}/src/google/protobuf/stubs/mutex.cc
   ${protobuf_source_dir}/src/google/protobuf/stubs/substitute.cc
   ${protobuf_source_dir}/src/google/protobuf/text_format.cc
   ${protobuf_source_dir}/src/google/protobuf/timestamp.pb.cc
@@ -82,6 +83,8 @@ set(libprotobuf_includes
   ${protobuf_source_dir}/src/google/protobuf/source_context.pb.h
   ${protobuf_source_dir}/src/google/protobuf/struct.pb.h
   ${protobuf_source_dir}/src/google/protobuf/stubs/mathlimits.h
+  ${protobuf_source_dir}/src/google/protobuf/stubs/mutex.h
+  ${protobuf_source_dir}/src/google/protobuf/stubs/once.h
   ${protobuf_source_dir}/src/google/protobuf/stubs/substitute.h
   ${protobuf_source_dir}/src/google/protobuf/text_format.h
   ${protobuf_source_dir}/src/google/protobuf/timestamp.pb.h

@@ -30,7 +30,6 @@
 #ifndef GOOGLE_PROTOBUF_STUBS_MUTEX_H_
 #define GOOGLE_PROTOBUF_STUBS_MUTEX_H_
 
-#include <mutex>
 
 #include <google/protobuf/stubs/macros.h>
 
@@ -61,15 +60,18 @@ namespace internal {
 // mutexes.
 class PROTOBUF_EXPORT WrappedMutex {
  public:
-  WrappedMutex() = default;
-  void Lock() GOOGLE_PROTOBUF_ACQUIRE() { mu_.lock(); }
-  void Unlock() GOOGLE_PROTOBUF_RELEASE() { mu_.unlock(); }
+  WrappedMutex();
+  virtual ~WrappedMutex();
+  void Lock() GOOGLE_PROTOBUF_ACQUIRE();
+  void Unlock() GOOGLE_PROTOBUF_RELEASE();
   // Crash if this Mutex is not held exclusively by this thread.
   // May fail to crash when it should; will never crash when it should not.
   void AssertHeld() const {}
 
+  // Use pimpl pattern so as not to include std::mutex here
  private:
-  std::mutex mu_;
+  class std_mutex;
+  std_mutex* mu_;
 };
 
 using Mutex = WrappedMutex;
