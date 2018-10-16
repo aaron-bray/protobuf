@@ -48,8 +48,8 @@ class LIBPROTOBUF_EXPORT WrappedMutex {
  public:
   WrappedMutex();
   virtual ~WrappedMutex();
-  void Lock() GOOGLE_PROTOBUF_ACQUIRE();
-  void Unlock() GOOGLE_PROTOBUF_RELEASE();
+  void Lock();
+  void Unlock();
   // Crash if this Mutex is not held exclusively by this thread.
   // May fail to crash when it should; will never crash when it should not.
   void AssertHeld() const {}

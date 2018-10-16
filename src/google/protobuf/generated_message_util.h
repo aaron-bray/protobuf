@@ -46,7 +46,6 @@
 
 #include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/once.h>  // Add direct dep on port for pb.cc
 #include <google/protobuf/has_bits.h>
 #include <google/protobuf/implicit_weak_message.h>
 #include <google/protobuf/map_entry_lite.h>
