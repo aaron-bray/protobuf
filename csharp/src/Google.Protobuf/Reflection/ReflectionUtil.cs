@@ -45,7 +45,75 @@ namespace Google.Protobuf.Reflection
     /// very fast compared with calling Invoke later on.
     /// </summary>
     internal static class ReflectionUtil
-    {
+	{
+#if true
+		internal static readonly Type[] EmptyTypes = new Type[0];
+
+		internal static Func<IMessage, object> CreateFuncIMessageObject(MethodInfo method)
+		{
+			return (IMessage msg) =>
+			{
+				try
+				{
+					//if (method.GetParameters().Length == 0)
+						return method.Invoke(msg, new object[] { });
+					//return method.Invoke(null, new object[] { msg });
+				}
+				catch (Exception e)
+				{
+					throw new Exception("FIMO:" + method.ToString() + "|" + e.ToString());
+				}
+			};
+		}
+		internal static Func<IMessage, int> CreateFuncIMessageInt32(MethodInfo method)
+		{
+			return (IMessage msg) =>
+			{
+				try
+				{
+					return (int) method.Invoke(msg, new object[] { });
+					//return (int) method.Invoke(null, new object[] { msg });
+				}
+				catch (Exception e)
+				{
+					throw new Exception("FIMI:" + method.ToString() + "|" + e.ToString());
+				}
+			};
+		}
+		internal static Action<IMessage, object> CreateActionIMessageObject(MethodInfo method)
+		{
+			return (IMessage msg, object arg) =>
+			{
+				try
+				{
+					method.Invoke(msg, new object[] { arg });
+					//method.Invoke(null, new object[] { msg, arg });
+				}
+				catch (Exception e)
+				{
+					throw new Exception("AIMO:" + method.ToString() + "|" + e.ToString());
+				}
+			};
+		}
+		internal static Action<IMessage> CreateActionIMessage(MethodInfo method)
+		{
+			return (IMessage msg) =>
+			{
+				try
+				{
+					method.Invoke(msg, new object[] { });
+					//method.Invoke(null, new object[] { msg });
+				}
+				catch (Exception e)
+				{
+					throw new Exception("AIM:" + method.ToString() + "|" + e.ToString());
+				}
+			};
+		}
+		internal static void ForceInitialize<T>()
+		{
+		}
+#else
         static ReflectionUtil()
         {
             ForceInitialize<string>(); // Handles all reference types
@@ -74,13 +142,13 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         internal static readonly Type[] EmptyTypes = new Type[0];
 
-        /// <summary>
-        /// Creates a delegate which will cast the argument to the type that declares the method,
-        /// call the method on it, then convert the result to object.
-        /// </summary>
-        /// <param name="method">The method to create a delegate for, which must be declared in an IMessage
-        /// implementation.</param>
-        internal static Func<IMessage, object> CreateFuncIMessageObject(MethodInfo method) =>
+		/// <summary>
+		/// Creates a delegate which will cast the argument to the type that declares the method,
+		/// call the method on it, then convert the result to object.
+		/// </summary>
+		/// <param name="method">The method to create a delegate for, which must be declared in an IMessage
+		/// implementation.</param>
+		internal static Func<IMessage, object> CreateFuncIMessageObject(MethodInfo method) =>
             GetReflectionHelper(method.DeclaringType, method.ReturnType).CreateFuncIMessageObject(method);
 
         /// <summary>
@@ -112,9 +180,6 @@ namespace Google.Protobuf.Reflection
         internal static Action<IMessage> CreateActionIMessage(MethodInfo method) =>
             GetReflectionHelper(method.DeclaringType, typeof(object)).CreateActionIMessage(method);
 
-        internal static Func<IMessage, bool> CreateFuncIMessageBool(MethodInfo method) =>
-            GetReflectionHelper(method.DeclaringType, method.ReturnType).CreateFuncIMessageBool(method);
-
         /// <summary>
         /// Creates a reflection helper for the given type arguments. Currently these are created on demand
         /// rather than cached; this will be "busy" when initially loading a message's descriptor, but after that
@@ -132,7 +197,6 @@ namespace Google.Protobuf.Reflection
             Action<IMessage> CreateActionIMessage(MethodInfo method);
             Func<IMessage, object> CreateFuncIMessageObject(MethodInfo method);
             Action<IMessage, object> CreateActionIMessageObject(MethodInfo method);
-            Func<IMessage, bool> CreateFuncIMessageBool(MethodInfo method);
         }
 
         private class ReflectionHelper<T1, T2> : IReflectionHelper
@@ -174,19 +238,14 @@ namespace Google.Protobuf.Reflection
                 var del = (Action<T1, T2>) method.CreateDelegate(typeof(Action<T1, T2>));
                 return (message, arg) => del((T1) message, (T2) arg);
             }
-
-            public Func<IMessage, bool> CreateFuncIMessageBool(MethodInfo method)
-            {
-                var del = (Func<T1, bool>)method.CreateDelegate(typeof(Func<T1, bool>));
-                return message => del((T1)message);
-            }
         }
+#endif
 
-        // Runtime compatibility checking code - see ReflectionHelper<T1, T2>.CreateFuncIMessageInt32 for
-        // details about why we're doing this.
+		// Runtime compatibility checking code - see ReflectionHelper<T1, T2>.CreateFuncIMessageInt32 for
+		// details about why we're doing this.
 
-        // Deliberately not inside the generic type. We only want to check this once.
-        private static bool CanConvertEnumFuncToInt32Func { get; } = CheckCanConvertEnumFuncToInt32Func();
+		// Deliberately not inside the generic type. We only want to check this once.
+		private static bool CanConvertEnumFuncToInt32Func { get; } = CheckCanConvertEnumFuncToInt32Func();
 
         private static bool CheckCanConvertEnumFuncToInt32Func()
         {
